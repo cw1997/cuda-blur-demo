@@ -6,10 +6,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(OpenCL REQUIRED)
 
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../shared ${CMAKE_CURRENT_BINARY_DIR}/shared)
+
 add_executable(blur_opencl
-        bmp.cpp
         blur.cpp
         main.cpp
 )
 
-target_link_libraries(blur_opencl PRIVATE OpenCL::OpenCL)
+target_link_libraries(blur_opencl PRIVATE OpenCL::OpenCL blur_shared)
