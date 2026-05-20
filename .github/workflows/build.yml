@@ -1,0 +1,75 @@
+name: Build
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  cpu:
+    name: CPU (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} src/cpu
+
+      - name: Build
+        run: cmake --build build --config ${{ env.BUILD_TYPE }}
+
+      - name: Run
+        run: ${{ runner.os == 'Windows' && 'build/Release/blur_cpu.exe' || 'build/blur_cpu' }} -i "${{ github.workspace }}/frieren-winter-1.bmp" -u output-cpu.bmp -r 128
+
+  cuda:
+    name: CUDA (compile-only)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: Jimver/cuda-toolkit@v0.2.22
+        id: cuda-toolkit
+        with:
+          cuda: '12.6'
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} src/cuda
+        env:
+          CMAKE_CUDA_COMPILER: ${{ steps.cuda-toolkit.outputs.CUDA_COMPILER }}
+
+      - name: Build
+        run: cmake --build build --config ${{ env.BUILD_TYPE }}
+
+  opencl:
+    name: OpenCL (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install OpenCL (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y opencl-headers ocl-icd-opencl-dev pocl-opencl-icd
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} src/opencl
+
+      - name: Build
+        run: cmake --build build --config ${{ env.BUILD_TYPE }}
+
+      - name: Run (Linux)
+        if: runner.os == 'Linux'
+        run: build/blur_opencl -i "${{ github.workspace }}/frieren-winter-1.bmp" -u output-opencl.bmp -r 128
