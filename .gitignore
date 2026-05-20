@@ -15,20 +15,30 @@ cmake_install.cmake
 CMakeUserPresets.json
 CTestTestfile.cmake
 compile_commands.json
+cmake-out/
+CMakeDirectoryInformation.cmake
+CTestCostData.txt
+CPackConfig.cmake
+CPackSourceConfig.cmake
 
 # Visual Studio
 .vs/
 *.sln
+*.slnx
+*.suo
+*.user
+*.userosscache
 *.vcxproj
 *.vcxproj.user
 *.vcxproj.filters
 *.vcxproj.FileListAbsolute.txt
+*.vcxproj.CopyComplete
 *.opensdf
 *.sdf
-*.suo
-*.user
-*.userosscache
 *.log
+*.tlog
+*.lastbuildstate
+*.unsuccessfulbuild
 ipch/
 Debug/
 Release/
@@ -39,9 +49,18 @@ x86/
 [Aa]rm/
 [Bb]in/
 [Oo]bj/
+*.dll.recipe
+*.exe.recipe
 
+# IDE
 .idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
 
+# Project output
 *.bmp
 *.jpg
 *.jpeg
