@@ -11,20 +11,17 @@ if [ $# -ne 1 ]; then
 fi
 
 VERSION="$1"
-BUILD_DIR="build/$VERSION"
+BUILD_DIR="build"
 EXE_NAME="blur_$VERSION"
-SOURCE_DIR="$(cd "$(dirname "$0")/$VERSION" && pwd)"
+ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-echo "====== Configure ($VERSION) ======"
-mkdir -p "$BUILD_DIR"
-pushd "$BUILD_DIR" > /dev/null
-cmake "$SOURCE_DIR" -DCMAKE_BUILD_TYPE=Release
+echo "====== Configure ======"
+cmake -B "$BUILD_DIR" "$ROOT_DIR" -DCMAKE_BUILD_TYPE=Release
 
 echo ""
 echo "====== Build ($VERSION) ======"
-cmake --build . --config Release
-popd > /dev/null
+cmake --build "$BUILD_DIR" --config Release --target "$EXE_NAME"
 
 echo ""
 echo "====== Run ($VERSION) ======"
-"$BUILD_DIR/$EXE_NAME" -i frieren-winter-1.bmp -u frieren-winter-1-blur-$VERSION.bmp -r 128
+"$BUILD_DIR/bin/$EXE_NAME" -i frieren-winter-1.bmp -u frieren-winter-1-blur-$VERSION.bmp -r 128
