@@ -1,6 +1,41 @@
+# CUDA
 *.i
 *.ii
 *.gpu
 *.ptx
 *.cubin
 *.fatbin
+
+# CMake
+build/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CMakeUserPresets.json
+CTestTestfile.cmake
+compile_commands.json
+
+# Visual Studio
+.vs/
+*.sln
+*.vcxproj
+*.vcxproj.user
+*.vcxproj.filters
+*.vcxproj.FileListAbsolute.txt
+*.opensdf
+*.sdf
+*.suo
+*.user
+*.userosscache
+*.log
+ipch/
+Debug/
+Release/
+x64/
+x86/
+[Ww]in32/
+[Ww]in64/
+[Aa]rm/
+[Bb]in/
+[Oo]bj/
