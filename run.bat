@@ -19,7 +19,7 @@ if %ERRORLEVEL% neq 0 (
 cd ..
 
 echo.
-echo ====== Run performance comparison ======
-build\Release\blur_demo.exe
+echo ====== Run blur ======
+build\Release\blur_demo.exe -i frieren-winter-1.bmp -u frieren-winter-1-blur.bmp -r 128
 
 pause
