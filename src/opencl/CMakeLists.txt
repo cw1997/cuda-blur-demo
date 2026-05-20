@@ -7,9 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(OpenCL REQUIRED)
 
 add_executable(blur_opencl
-    bmp.cpp
-    blur.cpp
-    main.cpp
+        bmp.cpp
+        blur.cpp
+        main.cpp
 )
 
 target_link_libraries(blur_opencl PRIVATE OpenCL::OpenCL)
