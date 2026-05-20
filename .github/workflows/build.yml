@@ -21,13 +21,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Configure
-        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} src/cpu
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
       - name: Build
-        run: cmake --build build --config ${{ env.BUILD_TYPE }}
+        run: cmake --build build --config ${{ env.BUILD_TYPE }} --target blur_cpu
 
       - name: Run
-        run: ${{ runner.os == 'Windows' && 'build/Release/blur_cpu.exe' || 'build/blur_cpu' }} -i "${{ github.workspace }}/frieren-winter-1.bmp" -u output-cpu.bmp -r 128
+        run: ${{ runner.os == 'Windows' && 'build/bin/Release/blur_cpu.exe' || 'build/bin/blur_cpu' }} -i "${{ github.workspace }}/frieren-winter-1.bmp" -u output-cpu.bmp -r 128
 
   cuda:
     name: CUDA (compile-only)
@@ -41,12 +41,12 @@ jobs:
           cuda: '12.6'
 
       - name: Configure
-        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} src/cuda
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
         env:
           CMAKE_CUDA_COMPILER: ${{ steps.cuda-toolkit.outputs.CUDA_COMPILER }}
 
       - name: Build
-        run: cmake --build build --config ${{ env.BUILD_TYPE }}
+        run: cmake --build build --config ${{ env.BUILD_TYPE }} --target blur_cuda
 
   opencl:
     name: OpenCL (${{ matrix.os }})
@@ -65,11 +65,11 @@ jobs:
           sudo apt-get install -y opencl-headers ocl-icd-opencl-dev pocl-opencl-icd
 
       - name: Configure
-        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} src/opencl
+        run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
       - name: Build
-        run: cmake --build build --config ${{ env.BUILD_TYPE }}
+        run: cmake --build build --config ${{ env.BUILD_TYPE }} --target blur_opencl
 
       - name: Run (Linux)
         if: runner.os == 'Linux'
-        run: build/blur_opencl -i "${{ github.workspace }}/frieren-winter-1.bmp" -u output-opencl.bmp -r 128
+        run: build/bin/blur_opencl -i "${{ github.workspace }}/frieren-winter-1.bmp" -u output-opencl.bmp -r 128
