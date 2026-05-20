@@ -41,3 +41,10 @@ x86/
 [Oo]bj/
 
 .idea/
+
+*.bmp
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.ico
