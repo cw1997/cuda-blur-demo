@@ -8,6 +8,8 @@
 #include <CL/cl.h>
 #endif
 
+// OpenCL kernel source for box blur with shared local memory tiling.
+// Architecture mirrors the CUDA kernel: cooperative tile load + local memory averaging.
 static const char* kernelSource =
 "__kernel void blurKernel(__global const uchar* input, __global uchar* output,\n"
 "                         int width, int height, int channels, int radius,\n"
@@ -64,6 +66,7 @@ static const char* kernelSource =
 "    }\n"
 "}\n";
 
+// Check OpenCL error code and exit on failure
 static void checkError(cl_int err, const char* msg) {
     if (err != CL_SUCCESS) {
         fprintf(stderr, "OpenCL error %d: %s\n", err, msg);
@@ -71,6 +74,8 @@ static void checkError(cl_int err, const char* msg) {
     }
 }
 
+// OpenCL box blur host wrapper
+// Initializes OpenCL (GPU), builds the kernel, launches it with profiling
 double blurImageOpenCL(const uint8_t* input, uint8_t* output, int width, int height, int kernelSize) {
     int radius = kernelSize / 2;
     int channels = 3;
@@ -78,6 +83,7 @@ double blurImageOpenCL(const uint8_t* input, uint8_t* output, int width, int hei
 
     cl_int err;
 
+    // Select OpenCL platform and GPU device
     cl_platform_id platform;
     cl_uint numPlatforms;
     err = clGetPlatformIDs(1, &platform, &numPlatforms);
@@ -88,6 +94,7 @@ double blurImageOpenCL(const uint8_t* input, uint8_t* output, int width, int hei
     err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, &numDevices);
     checkError(err, "clGetDeviceIDs (GPU)");
 
+    // Create context and command queue with profiling enabled
     cl_context context = clCreateContext(nullptr, 1, &device, nullptr, nullptr, &err);
     checkError(err, "clCreateContext");
 
@@ -95,6 +102,7 @@ double blurImageOpenCL(const uint8_t* input, uint8_t* output, int width, int hei
     cl_command_queue queue = clCreateCommandQueue(context, device, props, &err);
     checkError(err, "clCreateCommandQueue");
 
+    // Build the kernel program from embedded source
     cl_program program = clCreateProgramWithSource(context, 1, &kernelSource, nullptr, &err);
     checkError(err, "clCreateProgramWithSource");
 
@@ -112,6 +120,7 @@ double blurImageOpenCL(const uint8_t* input, uint8_t* output, int width, int hei
     cl_kernel kernel = clCreateKernel(program, "blurKernel", &err);
     checkError(err, "clCreateKernel");
 
+    // Allocate device buffers and upload input
     cl_mem d_input = clCreateBuffer(context, CL_MEM_READ_ONLY, dataSize, nullptr, &err);
     checkError(err, "clCreateBuffer (input)");
 
@@ -121,6 +130,7 @@ double blurImageOpenCL(const uint8_t* input, uint8_t* output, int width, int hei
     err = clEnqueueWriteBuffer(queue, d_input, CL_TRUE, 0, dataSize, input, 0, nullptr, nullptr);
     checkError(err, "clEnqueueWriteBuffer");
 
+    // Launch configuration: 16x16 work-group, global size rounded to work-group multiple
     size_t local[2] = { 16, 16 };
     size_t global[2] = {
         ((size_t)width + local[0] - 1) / local[0] * local[0],
@@ -131,6 +141,7 @@ double blurImageOpenCL(const uint8_t* input, uint8_t* output, int width, int hei
     size_t tileH = local[1] + 2 * radius;
     size_t localMemSize = tileW * tileH * channels * sizeof(cl_uchar);
 
+    // Set kernel arguments
     err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &d_input);
     checkError(err, "clSetKernelArg 0");
     err = clSetKernelArg(kernel, 1, sizeof(cl_mem), &d_output);
@@ -146,6 +157,7 @@ double blurImageOpenCL(const uint8_t* input, uint8_t* output, int width, int hei
     err = clSetKernelArg(kernel, 6, localMemSize, nullptr);
     checkError(err, "clSetKernelArg 6 (__local)");
 
+    // Enqueue kernel and wait for completion
     cl_event event;
     err = clEnqueueNDRangeKernel(queue, kernel, 2, nullptr, global, local, 0, nullptr, &event);
     checkError(err, "clEnqueueNDRangeKernel");
@@ -153,14 +165,17 @@ double blurImageOpenCL(const uint8_t* input, uint8_t* output, int width, int hei
     err = clWaitForEvents(1, &event);
     checkError(err, "clWaitForEvents");
 
+    // Measure kernel execution time via OpenCL event profiling
     cl_ulong startTime, endTime;
     clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &startTime, nullptr);
     clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &endTime, nullptr);
     double ms = (double)(endTime - startTime) / 1000000.0;
 
+    // Download result
     err = clEnqueueReadBuffer(queue, d_output, CL_TRUE, 0, dataSize, output, 0, nullptr, nullptr);
     checkError(err, "clEnqueueReadBuffer");
 
+    // Cleanup
     clReleaseEvent(event);
     clReleaseKernel(kernel);
     clReleaseProgram(program);

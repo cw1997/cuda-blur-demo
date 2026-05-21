@@ -1,8 +1,11 @@
 @echo off
 chcp 65001 >nul
 
+:: Build script for Windows (MSVC + Visual Studio generator)
+:: Usage: build.bat {cpu | cuda | opencl}
+
 if "%1"=="" (
-    echo Usage: build.bat {cpu^|cuda^|opencl}
+    echo Usage: build.bat {cpu^| cuda^| opencl}
     echo.
     echo   cpu    - Build CPU-only version (no GPU required)
     echo   cuda   - Build CUDA version (requires NVIDIA GPU + CUDA Toolkit)

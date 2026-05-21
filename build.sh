@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Build script for Linux/macOS
+# Usage: build.sh {cpu | cuda | opencl}
+
 if [ $# -ne 1 ]; then
     echo "Usage: $0 {cpu|cuda|opencl}"
     echo ""

@@ -5,11 +5,14 @@
 #include <cstdlib>
 #include <vector>
 
+// OpenCL blur entry point
+// Usage: blur_opencl -i <input.bmp> [-u <output.bmp>] [-r <radius>]...
 int main(int argc, char* argv[]) {
     std::string inputFile;
     std::string outFile = "output.bmp";
     std::vector<int> kernels;
 
+    // Parse command-line arguments
     for (int i = 1; i < argc; i++) {
         std::string arg = argv[i];
         if (arg == "-i" && i + 1 < argc) {
@@ -33,6 +36,7 @@ int main(int argc, char* argv[]) {
         kernels = { 3 };
     }
 
+    // Load input image
     uint8_t* image = nullptr;
     int w = 0, h = 0;
 
@@ -47,9 +51,11 @@ int main(int argc, char* argv[]) {
     int kernelSize = kernels.back() * 2 + 1;
     std::cout << "Input: " << inputFile << " (" << w << " x " << h << ")\n";
 
+    // Run OpenCL blur and measure execution time
     double ms = blurImageOpenCL(image, blurred, w, h, kernelSize);
     std::cout << "Blur (kernel " << kernelSize << "x" << kernelSize << "): " << ms << " ms\n";
 
+    // Save output
     if (writeBMP(outFile.c_str(), blurred, w, h)) {
         std::cout << "Saved: " << outFile << "\n";
     } else {
