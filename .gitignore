@@ -1,45 +1,99 @@
-# CUDA
+# === Compiler & linker intermediate artifacts ===
+# Object files
+*.o
+*.obj
+*.a
+*.lo
+*.la
+# Libraries
+*.lib
+*.dll
+*.so
+*.so.*
+*.dylib
+# Executables
+*.exe
+*.out
+*.app
+# Debug symbols and build metadata
+*.pdb
+*.dbg
+*.ilk
+*.map
+*.exp
+*.ipdb
+*.iobj
+*.res
+*.pre
+*.rsp
+*.sbr
+*.def
+# Precompiled headers
+*.gch
+*.pch
+# Architecture-specific outputs
+*.i*86
+*.x86_64
+*.hex
+
+# === C++ specific outputs ===
+*.cpp.obj
+*.cpp.o
+
+# === CUDA specific artifacts ===
+# PTX / cubin intermediate representations
 *.i
 *.ii
 *.gpu
 *.ptx
 *.cubin
 *.fatbin
+# CUDA front-end generated source files
+*.cudafe
+*.cudafe1
+*.cudafe1.cpp
+*.cudafe2
+*.cudafe2.cpp
+*.cudafe1.gpu
+*.cudafe2.gpu
+# CUDA runtime cache and metadata
+*.cuda.cache
+*.cudart
+*.cu.obj
+*.cu.res
+*.cu.dll
+*.cu.exe
+tmpxft*
+.cuda_flags
+*.dependent.*
 
-# CMake
-build/
-cmake-build-*/
-CMakeCache.txt
-CMakeFiles/
-cmake_install.cmake
-CMakeUserPresets.json
-CTestTestfile.cmake
-compile_commands.json
-cmake-out/
-CMakeDirectoryInformation.cmake
-CTestCostData.txt
-CPackConfig.cmake
-CPackSourceConfig.cmake
-
-# Visual Studio
-.vs/
+# === Visual Studio solution & project files ===
+# Solution files (legacy .sln and new .slnx format)
 *.sln
 *.slnx
-*.suo
-*.user
-*.userosscache
+# Project files
 *.vcxproj
 *.vcxproj.user
 *.vcxproj.filters
 *.vcxproj.FileListAbsolute.txt
 *.vcxproj.CopyComplete
+# User-specific settings and cache
+*.suo
+*.user
+*.userosscache
 *.opensdf
 *.sdf
+# Build logs
 *.log
 *.tlog
 *.lastbuildstate
 *.unsuccessfulbuild
+*.dll.recipe
+*.exe.recipe
+# IntelliSense database
 ipch/
+.vs/
+# Build output directories
 Debug/
 Release/
 x64/
@@ -49,10 +103,29 @@ x86/
 [Aa]rm/
 [Bb]in/
 [Oo]bj/
-*.dll.recipe
-*.exe.recipe
 
-# IDE
+# === CMake generated files ===
+# Build tree
+build/
+cmake-build-*/
+cmake-out/
+# CMake per-target directories (e.g. ALL_BUILD.dir/, ZERO_CHECK.dir/)
+*.dir/
+# CMake cache and config
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CMakeDirectoryInformation.cmake
+CMakeUserPresets.json
+# CTest / CPack
+CTestTestfile.cmake
+CTestCostData.txt
+CPackConfig.cmake
+CPackSourceConfig.cmake
+# Compilation database
+compile_commands.json
+
+# === IDE / editor ===
 .idea/
 .vscode/
 *.swp
@@ -60,7 +133,7 @@ x86/
 *~
 .DS_Store
 
-# Project output
+# === Project output images ===
 *.bmp
 *.jpg
 *.jpeg
