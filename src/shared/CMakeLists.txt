@@ -1,3 +1,4 @@
+# Static library for shared BMP utilities
 add_library(blur_shared STATIC
     bmp.cpp
 )
