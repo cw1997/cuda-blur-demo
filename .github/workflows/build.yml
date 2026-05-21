@@ -27,7 +27,13 @@ jobs:
         run: cmake --build build --config ${{ env.BUILD_TYPE }} --target blur_cpu
 
       - name: Run
-        run: ${{ runner.os == 'Windows' && 'build/bin/Release/blur_cpu.exe' || 'build/bin/blur_cpu' }} -i "${{ github.workspace }}/frieren-winter-1.bmp" -u output-cpu.bmp -r 128
+        shell: bash
+        run: |
+          case "${{ runner.os }}" in
+            Windows) EXE="build/bin/Release/blur_cpu.exe" ;;
+            *)       EXE="build/bin/blur_cpu" ;;
+          esac
+          "${EXE}" -i "${{ github.workspace }}/frieren-winter-1.bmp" -u output-cpu.bmp -r 128
 
   cuda:
     name: CUDA (compile-only)
@@ -49,17 +55,12 @@ jobs:
         run: cmake --build build --config ${{ env.BUILD_TYPE }} --target blur_cuda
 
   opencl:
-    name: OpenCL (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
+    name: OpenCL
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install OpenCL (Linux)
-        if: runner.os == 'Linux'
+      - name: Install OpenCL
         run: |
           sudo apt-get update
           sudo apt-get install -y opencl-headers ocl-icd-opencl-dev pocl-opencl-icd
@@ -70,6 +71,5 @@ jobs:
       - name: Build
         run: cmake --build build --config ${{ env.BUILD_TYPE }} --target blur_opencl
 
-      - name: Run (Linux)
-        if: runner.os == 'Linux'
+      - name: Run
         run: build/bin/blur_opencl -i "${{ github.workspace }}/frieren-winter-1.bmp" -u output-opencl.bmp -r 128
